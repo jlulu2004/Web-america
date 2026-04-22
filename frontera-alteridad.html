@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Frontera & Alteridad</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Bebas+Neue&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F5F0E8;
+    --ink: #1A1410;
+    --rust: #C4552A;
+    --dust: #9B8E7F;
+    --pale: #E8E0D0;
+    --gold: #B8963E;
+    --line: rgba(26,20,16,0.15);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Cormorant Garamond', serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed;
+    width: 8px; height: 8px;
+    background: var(--rust);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 32px; height: 32px;
+    border: 1px solid var(--rust);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: all 0.18s ease;
+    opacity: 0.5;
+  }
+
+  /* ─── HERO ─────────────────────────────────────────── */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 3px 1fr;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-divider {
+    background: var(--ink);
+    position: relative;
+    z-index: 2;
+  }
+  .hero-divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    width: 1px;
+    height: 60px;
+    background: var(--cream);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:0} 50%{opacity:1} }
+
+  .hero-left {
+    background: var(--ink);
+    color: var(--cream);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 4rem 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-left::before {
+    content: 'FRONTERA';
+    position: absolute;
+    top: 50%;
+    left: -1rem;
+    transform: translateY(-50%) rotate(-90deg);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(6rem, 14vw, 16rem);
+    color: rgba(255,255,255,0.04);
+    white-space: nowrap;
+    letter-spacing: 0.05em;
+    pointer-events: none;
+  }
+
+  .hero-right {
+    background: var(--cream);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 4rem 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-right::before {
+    content: 'ALTERIDAD';
+    position: absolute;
+    bottom: 50%;
+    right: -2rem;
+    transform: translateY(50%) rotate(90deg);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(6rem, 14vw, 16rem);
+    color: rgba(26,20,16,0.04);
+    white-space: nowrap;
+    letter-spacing: 0.05em;
+    pointer-events: none;
+  }
+
+  .hero-word {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 7vw, 7rem);
+    letter-spacing: 0.08em;
+    line-height: 0.9;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards;
+  }
+  .hero-left .hero-word { animation-delay: 0.3s; }
+  .hero-right .hero-word { animation-delay: 0.6s; color: var(--ink); }
+
+  .hero-def {
+    font-size: clamp(0.85rem, 1.2vw, 1.05rem);
+    font-style: italic;
+    line-height: 1.7;
+    max-width: 340px;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards;
+  }
+  .hero-left .hero-def { color: rgba(245,240,232,0.7); animation-delay: 0.6s; }
+  .hero-right .hero-def { color: var(--dust); animation-delay: 0.9s; }
+
+  .hero-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards;
+  }
+  .hero-left .hero-num { color: var(--rust); animation-delay: 0.2s; }
+  .hero-right .hero-num { color: var(--rust); animation-delay: 0.5s; }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform: translateY(24px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    color: var(--dust);
+    z-index: 10;
+    opacity: 0;
+    animation: fadeUp 1s 1.5s ease forwards;
+  }
+  .scroll-hint span {
+    display: block;
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--dust), transparent);
+    animation: grow 1.5s ease-in-out infinite;
+  }
+  @keyframes grow { 0%,100%{transform:scaleY(0);transform-origin:top} 50%{transform:scaleY(1)} }
+
+  /* ─── INTRO ─────────────────────────────────────────── */
+  .intro {
+    padding: 8rem 10vw;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .intro-quote {
+    font-size: clamp(1.8rem, 3vw, 3.2rem);
+    font-weight: 300;
+    line-height: 1.3;
+    font-style: italic;
+    color: var(--ink);
+    position: relative;
+    padding-left: 2rem;
+  }
+  .intro-quote::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0.2em;
+    width: 3px;
+    height: 80%;
+    background: var(--rust);
+  }
+
+  .intro-text {
+    font-size: 1.1rem;
+    line-height: 1.9;
+    color: var(--dust);
+    align-self: end;
+  }
+  .intro-text strong { color: var(--ink); font-weight: 600; }
+
+  /* ─── NAV DISCIPLINES ────────────────────────────────── */
+  .disciplines-nav {
+    padding: 0 10vw;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    position: sticky;
+    top: 0;
+    background: var(--cream);
+    z-index: 100;
+  }
+  .disciplines-nav::-webkit-scrollbar { display: none; }
+
+  .disc-tab {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 1.2rem 1.8rem;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--dust);
+    position: relative;
+    transition: color 0.3s;
+    white-space: nowrap;
+  }
+  .disc-tab::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--rust);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+  }
+  .disc-tab:hover, .disc-tab.active { color: var(--ink); }
+  .disc-tab.active::after { transform: scaleX(1); }
+
+  /* ─── DISCIPLINE SECTIONS ────────────────────────────── */
+  .discipline-section {
+    padding: 7rem 10vw;
+    border-bottom: 1px solid var(--line);
+    display: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .discipline-section.active {
+    display: block;
+    animation: sectionFade 0.5s ease forwards;
+  }
+  @keyframes sectionFade {
+    from { opacity:0; transform: translateY(12px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+
+  .section-header {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 3rem;
+    align-items: start;
+    margin-bottom: 5rem;
+  }
+
+  .section-index {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(5rem, 10vw, 10rem);
+    color: var(--pale);
+    line-height: 0.85;
+    user-select: none;
+  }
+
+  .section-title-block {}
+
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 0.8rem;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.5rem, 5vw, 5rem);
+    letter-spacing: 0.06em;
+    line-height: 0.9;
+    margin-bottom: 1.5rem;
+  }
+
+  .section-subtitle {
+    font-size: 1.15rem;
+    font-style: italic;
+    color: var(--dust);
+    line-height: 1.7;
+    max-width: 560px;
+  }
+
+  /* Content grid */
+  .content-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2px;
+    margin-bottom: 4rem;
+  }
+
+  .content-card {
+    background: var(--pale);
+    padding: 2.5rem 2rem;
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+    transition: background 0.3s;
+  }
+  .content-card:hover { background: var(--ink); color: var(--cream); }
+  .content-card:hover .card-label { color: var(--rust); }
+  .content-card:hover .card-body { color: rgba(245,240,232,0.7); }
+
+  .card-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 1rem;
+    transition: color 0.3s;
+  }
+
+  .card-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.8rem;
+    transition: color 0.3s;
+  }
+
+  .card-body {
+    font-size: 0.95rem;
+    line-height: 1.75;
+    color: var(--dust);
+    transition: color 0.3s;
+  }
+
+  .card-corner {
+    position: absolute;
+    bottom: 1.2rem;
+    right: 1.5rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 1.5rem;
+    color: rgba(26,20,16,0.06);
+    transition: color 0.3s;
+    pointer-events: none;
+  }
+  .content-card:hover .card-corner { color: rgba(245,240,232,0.06); }
+
+  /* Pull quote */
+  .pull-quote {
+    border-left: 3px solid var(--rust);
+    padding: 1.5rem 2.5rem;
+    margin: 3rem 0;
+    font-size: clamp(1.1rem, 2vw, 1.5rem);
+    font-style: italic;
+    color: var(--ink);
+    line-height: 1.6;
+    background: var(--pale);
+  }
+  .pull-quote cite {
+    display: block;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--dust);
+    font-style: normal;
+    margin-top: 0.8rem;
+  }
+
+  /* Concept tags */
+  .concept-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.4rem 0.9rem;
+    border: 1px solid var(--line);
+    color: var(--dust);
+    transition: all 0.2s;
+  }
+  .tag:hover {
+    border-color: var(--rust);
+    color: var(--rust);
+    background: rgba(196,85,42,0.05);
+  }
+
+  /* ─── THEORY BAND ─────────────────────────────────── */
+  .theory-band {
+    background: var(--ink);
+    color: var(--cream);
+    padding: 6rem 10vw;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 4rem;
+    border-top: 3px solid var(--rust);
+  }
+
+  .theory-item {}
+  .theory-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--rust);
+    letter-spacing: 0.3em;
+    margin-bottom: 1.2rem;
+  }
+  .theory-term {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.8rem;
+    color: var(--cream);
+  }
+  .theory-author {
+    font-size: 0.75rem;
+    color: var(--rust);
+    font-style: italic;
+    margin-bottom: 0.6rem;
+    font-family: 'Space Mono', monospace;
+  }
+  .theory-body {
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: rgba(245,240,232,0.55);
+  }
+
+  /* ─── FOOTER ─────────────────────────────────────── */
+  footer {
+    padding: 4rem 10vw;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .footer-brand {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.3rem;
+    letter-spacing: 0.12em;
+    color: var(--ink);
+  }
+  .footer-brand span { color: var(--rust); }
+  .footer-note {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--dust);
+    letter-spacing: 0.15em;
+  }
+
+  /* ─── RESPONSIVE ─────────────────────────────────── */
+  @media (max-width: 768px) {
+    .hero { grid-template-columns: 1fr; grid-template-rows: 1fr 3px 1fr; min-height: auto; }
+    .hero-divider { width: 100%; height: 3px; }
+    .hero-left, .hero-right { padding: 3rem 1.5rem; min-height: 50vh; }
+    .intro { grid-template-columns: 1fr; gap: 2rem; padding: 4rem 6vw; }
+    .theory-band { grid-template-columns: 1fr; gap: 2.5rem; padding: 4rem 6vw; }
+    .section-header { grid-template-columns: 1fr; gap: 1rem; }
+    .section-index { font-size: 5rem; }
+    footer { flex-direction: column; align-items: flex-start; }
+    .discipline-section { padding: 4rem 6vw; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- ═══ HERO ═══════════════════════════════════════════════ -->
+<header class="hero" id="top">
+  <div class="hero-left">
+    <div class="hero-num">01 — Concepto</div>
+    <div class="hero-word">Frontera</div>
+    <p class="hero-def">Línea —real o simbólica— que delimita, separa y define un territorio. Espacio de tensión entre lo interior y lo exterior, entre lo propio y lo ajeno.</p>
+  </div>
+  <div class="hero-divider"></div>
+  <div class="hero-right">
+    <div class="hero-num">02 — Concepto</div>
+    <div class="hero-word">Alteridad</div>
+    <p class="hero-def">La condición del <em>otro</em>. Reconocimiento de que existe una otredad irreductible que me define tanto como mi propia identidad.</p>
+  </div>
+  <div class="scroll-hint">EXPLORAR<span></span></div>
+</header>
+
+<!-- ═══ INTRO ═══════════════════════════════════════════════ -->
+<section class="intro">
+  <div class="intro-quote">
+    "La frontera no es el lugar donde algo termina, sino donde algo comienza a hacerse presente."
+  </div>
+  <div class="intro-text">
+    <p><strong>Frontera y alteridad</strong> son dos conceptos filosóficos que atraviesan todas las disciplinas artísticas. No como metáfora decorativa, sino como estructura profunda: el arte necesita al <em>otro</em> para existir —el espectador, el lector, el oyente.</p>
+    <br>
+    <p>Esta exploración recorre <strong>cine, música, arquitectura, literatura, escultura y pintura</strong> para cartografiar cómo cada disciplina construye, transgrede o disuelve sus propias fronteras.</p>
+  </div>
+</section>
+
+<!-- ═══ NAVIGATION ══════════════════════════════════════════ -->
+<nav class="disciplines-nav" id="discNav">
+  <button class="disc-tab active" data-target="cine">Cine</button>
+  <button class="disc-tab" data-target="musica">Música</button>
+  <button class="disc-tab" data-target="arquitectura">Arquitectura</button>
+  <button class="disc-tab" data-target="literatura">Literatura</button>
+  <button class="disc-tab" data-target="escultura">Escultura</button>
+  <button class="disc-tab" data-target="pintura">Pintura</button>
+</nav>
+
+<!-- ═══ CINE ════════════════════════════════════════════════ -->
+<section class="discipline-section active" id="cine">
+  <div class="section-header">
+    <div class="section-index">01</div>
+    <div class="section-title-block">
+      <div class="section-label">Arte visual · Narrativa · Tiempo</div>
+      <h2 class="section-title">Cine</h2>
+      <p class="section-subtitle">El encuadre como frontera: lo que queda dentro y fuera del plano define la mirada. El fuera de campo es el territorio del otro que nunca vemos del todo.</p>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <div class="content-card">
+      <div class="card-label">Concepto central</div>
+      <div class="card-title">El Fuera de Campo</div>
+      <div class="card-body">Lo que la cámara excluye no desaparece —habita el espacio mental del espectador. Jacques Aumont lo definía como el espacio imaginado más allá del encuadre: la alteridad siempre presente, nunca mostrada.</div>
+      <div class="card-corner">⊞</div>
+    </div>
+    <div class="content-card">
+      <div class="card-label">Referente clave</div>
+      <div class="card-title">Fronteras Nacionales</div>
+      <div class="card-body">Desde <em>El Norte</em> (1983) de Gregory Nava hasta <em>Cafarnaúm</em> (2018), el cine de migración convierte la frontera geográfica en frontera existencial: cruzarla es devenir otro, perder y encontrar identidad.</div>
+      <div class="card-corner">⊞</div>
+    </div>
+    <div class="content-card">
+      <div class="card-label">Teoría</div>
+      <div class="card-title">La Mirada del Otro</div>
+      <div class="card-body">Laura Mulvey y la <em>male gaze</em>; Frantz Fanon sobre la mirada colonizadora. El cine construye alteridades al decidir quién es sujeto y quién objeto de la mirada.</div>
+      <div class="card-corner">⊞</div>
+    </div>
+    <div class="content-card">
+      <div class="card-label">Ejemplo</div>
+      <div class="card-title">Chungking Express</div>
+      <div class="card-body">Wong Kar-wai filma Hong Kong como ciudad-frontera: entre Oriente y Occidente, entre el pasado colonial y la inminente transferencia. Los personajes son extraños en su propia ciudad.</div>
+      <div class="card-corner">⊞</div>
+    </div>
+  </div>
+
+  <div class="pull-quote">
+    "El cine es el arte de mostrar lo que no se puede mostrar: usa la frontera del encuadre para invocar la infinitud de lo que queda fuera."
+    <cite>— Adaptado de Gilles Deleuze, <em>La imagen-tiempo</em></cite>
+  </div>
+
+  <div class="concept-tags">
+    <span class="tag">Fuera de campo</span>
+    <span class="tag">Cine de migración</span>
+    <span class="tag">Encuadre como límite</span>
+    <span class="tag">Mirada y alteridad</span>
+    <span class="tag">Cine poscolonial</span>
+    <span class="tag">Umbral narrativo</span>
+  </div>
+</section>
+
+<!-- ═══ MÚSICA ══════════════════════════════════════════════ -->
+<section class="discipline-section" id="musica">
+  <div class="section-header">
+    <div class="section-index">02</div>
+    <div class="section-title-block">
+      <div class="section-label">Sonido · Tiempo · Silencio</div>
+      <h2 class="section-title">Música</h2>
+      <p class="section-subtitle">El silencio como frontera entre sonidos. La disonancia como irrupción de lo otro dentro de lo armónico. La música del mundo como escucha del ajeno.</p>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <div class="content-card">
+      <div class="card-label">Concepto central</div>
+      <div class="card-title">El Silencio de Cage</div>
+      <div class="card-body">John Cage con <em>4'33"</em> (1952) convierte el silencio en frontera absoluta: el sonido del entorno —lo otro, lo involuntario— irrumpe y se vuelve música. La alteridad sonora se hace obra.</div>
+      <div class="card-corner">♩</div>
+    </div>
+    <div class="content-card">
+      <div class="card-label">World Music</div>
+      <div class="card-title">Músicas del Margen</div>
+      <div class="card-body">El concepto de <em>world music</em> como categoría es en sí una frontera: agrupa todo lo "otro" respecto a la música occidental. Peter Gabriel y el WOMAD intentaron disolver esa frontera —o la reforzaron al nombrarla.</div>
+      <div class="card-corner">♩</div>
+    </div>
+    <div class="content-card">
+      <div class="card-label">Forma</div>
+      <div class="card-title">La Disonancia</div>
+      <div class="card-body">En armonía tonal, la disonancia es el intruso, lo otro que tensiona y pide resolución. Schönberg liberó la disonancia: si todo puede sonar, no hay frontera entre lo consonante y lo disonante, entre lo propio y lo ajeno.</div>
+      <div class="card-corner">♩</div>
+    </div>
+    <div class="content-card">
+      <div class="card-label">Ejemplo</div>
+      <div class="card-title">Coltrane & la Liberación</div>
+      <div class="card-body">El free jazz de John Coltrane en <em>A Love Supreme</em> y <em>Ascension</em> cruza la frontera de la estructura musical convencional como acto político: el jazz negro transgrediendo las formas del jazz blanco.</div>
+      <div class="card-corner">♩</div>
+    </div>
+  </div>
+
+  <div class="pull-quote">
+    "Escuchar al otro es ya un acto de hospitalidad. La música que no reconozco me hace reconocer mis propias fronteras."
+    <cite>— Peter Szendy, <em>Escucha</em></cite>
+  </div>
+
+  <div class="concept-tags">
+    <span class="tag">Silencio</span>
+    <span class="tag">Disonancia</span>
+    <span class="tag">World Music</span>
+    <span class="tag">Free Jazz</span>
+    <span class="tag">Escucha</span>
+    <span class="tag">Música poscolonial</span>
+  </div>
+</section>
+
+<!-- ═══ ARQUITECTURA ════════════════════════════════════════ -->
+<section class="discipline-section" id="arquitectura">
+  <div class="section-header">
+    <div class="section-index">03</div>
+    <div class="section-title-block">
+      <div class="section-label">Espacio · Umbral · Habitabilidad</div>
+      <h2 class="section-title">Arquitectura</h2>
+      <p class="section-subtitle">La arquitectura es, en esencia, la producción de fronteras: muros, puertas, umbrales. Decide quién pertenece a un espacio y quién queda fuera.</p>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <div class="content-card">
+      <div class="card-label">Concepto central</div>
+      <div class="card-title">El Umbral</div>
+      <div class="card-body">El umbral —la puerta, el dintel— es el espacio liminal por excelencia. No es interior ni exterior: es la frontera habitada. Victor Turner lo llamaba el espacio de lo <em>liminoide</em>, donde las identidades se disuelven y rehacen.</div>
+      <div class="card-corner">⌂</div>
+    </div>
+    <div class="content-card">
+      <div class="card-label">Arquitectura política</div>
+      <div class="card-title">Muros que Separan</div>
+      <div class="card-body">El muro de Berlín, el muro de Cisjordania, el muro en la frontera México-EE.UU. La arquitectura como instrumento de frontera radical: no solo separa espacios sino identidades, posibilidades, vidas.</div>
+      <div class="card-corner">⌂</div>
+    </div>
+    <div class="content-card">
+      <div class="card-label">Contrahegemonía</div>
+      <div class="card-title">Arquitectura Sin Fronteras</div>
+      <div class="card-body">Movimientos como <em>Arquitectura Sin Fronteras</em> o el trabajo de Hassan Fathy en Egipto plantean una arquitectura para el otro: no para el cliente que puede pagar, sino para las comunidades excluidas del diseño.</div>
+      <div class="card-corner">⌂</div>
+    </div>
+    <div class="content-card">
+      <div class="card-label">Ejemplo</div>
+      <div class="card-title">Daniel Libeskind</div>
+      <div class="card-body">El Museo Judío de Berlín construye la alteridad en sus materiales: los huecos ("void spaces") representan la ausencia, lo que no puede habitarse. La frontera entre presencia y ausencia como elemento arquitectónico.</div>
+      <div class="card-corner">⌂</div>
+    </div>
+  </div>
+
+  <div class="pull-quote">
+    "Toda arquitectura es política: decide quién puede entrar, quién debe quedarse fuera, quién es el otro del espacio construido."
+    <cite>— Beatriz Colomina, <em>Privacy and Publicity</em></cite>
+  </div>
+
+  <div class="concept-tags">
+    <span class="tag">Umbral</span>
+    <span class="tag">Liminalidad</span>
+    <span class="tag">Muro</span>
+    <span class="tag">Espacio público/privado</span>
+    <span class="tag">Arquitectura política</span>
+    <span class="tag">Vacío</span>
+  </div>
+</section>
+
+<!-- ═══ LITERATURA ══════════════════════════════════════════ -->
+<section class="discipline-section" id="literatura">
+  <div class="section-header">
+    <div class="section-index">04</div>
+    <div class="section-title-block">
+      <div class="section-label">Lenguaje · Narración · Otredad</div>
+      <h2 class="section-title">Literatura</h2>
+      <p class="section-subtitle">El lenguaje mismo es una frontera: lo que puede decirse y lo que queda fuera del decir. La literatura explora los bordes de lo nombrable.</p>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <div class="content-card">
+      <div class="card-label">Concepto central</div>
+      <div class="card-title">El Narrador No Fiable</div>
+      <div class="card-body">Desde Humbert Humbert hasta Stevens en <em>Lo que queda del día</em>, el narrador no fiable construye su propia frontera cognitiva: no puede ver al otro porque solo se ve a sí mismo. La alteridad queda sepultada bajo la voz narradora.</div>
+      <div class="card-corner">✒</div>
+    </div>
+    <div class="content-card">
+      <div class="card-label">Literatura Chicana</div>
+      <div class="card-title">Gloria Anzaldúa</div>
+      <div class="card-body"><em>Borderlands / La Frontera</em> (1987) es el texto fundacional: Anzaldúa teoriza la "nueva mestiza" como sujeto fronterizo que habita la contradicción. No elige entre identidades: las vive todas simultáneamente.</div>
+      <div class="card-corner">✒</div>
+    </div>
+    <div class="content-card">
+      <div class="card-label">Modernismo</div>
+      <div class="card-title">La Otredad en Kafka</div>
+      <div class="card-body">Gregor Samsa se convierte en insecto: deviene el otro absoluto para su propia familia. Kafka explora cómo la alteridad extrema revela las fronteras ocultas de los afectos y las relaciones sociales.</div>
+      <div class="card-corner">✒</div>
+    </div>
+    <div class="content-card">
+      <div class="card-label">Poscolonialismo</div>
+      <div class="card-title">Chimamanda & el Peligro</div>
+      <div class="card-body">Chimamanda Ngozi Adichie advertía del peligro de la historia única: cuando solo existe una narrativa sobre el otro, la frontera entre nosotros y ellos se vuelve impenetrable. La literatura multiplica las voces para erosionarla.</div>
+      <div class="card-corner">✒</div>
+    </div>
+  </div>
+
+  <div class="pull-quote">
+    "Escribir al otro sin convertirlo en objeto es el reto ético de toda literatura: dar voz sin apropiarse de la voz ajena."
+    <cite>— Emmanuel Lévinas, reinterpretado por Toni Morrison</cite>
+  </div>
+
+  <div class="concept-tags">
+    <span class="tag">Borderlands</span>
+    <span class="tag">Narrador fronterizo</span>
+    <span class="tag">Historia única</span>
+    <span class="tag">Otredad kafkiana</span>
+    <span class="tag">Literatura poscolonial</span>
+    <span class="tag">Mestizaje literario</span>
+  </div>
+</section>
+
+<!-- ═══ ESCULTURA ═══════════════════════════════════════════ -->
+<section class="discipline-section" id="escultura">
+  <div class="section-header">
+    <div class="section-index">05</div>
+    <div class="section-title-block">
+      <div class="section-label">Materia · Cuerpo · Espacio</div>
+      <h2 class="section-title">Escultura</h2>
+      <p class="section-subtitle">La escultura negocia constantemente con su entorno: dónde termina el objeto y comienza el espacio es siempre una frontera en tensión.</p>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <div class="content-card">
+      <div class="card-label">Concepto central</div>
+      <div class="card-title">El Espacio Negativo</div>
+      <div class="card-body">En escultura, el espacio que rodea y penetra la forma es tan constitutivo como la materia misma. Henry Moore entendía sus esculturas como diálogo entre forma y vacío: la frontera entre ambos es la obra.</div>
+      <div class="card-corner">◈</div>
+    </div>
+    <div class="content-card">
+      <div class="card-label">Arte público</div>
+      <div class="card-title">Monumentos & Memoria</div>
+      <div class="card-body">Las estatuas conmemorativas establecen quién merece ser recordado —y quién queda fuera de la memoria colectiva. El derribo de estatuas coloniales (Rhodes, Colston) es un acto de rearticulación de la alteridad histórica.</div>
+      <div class="card-corner">◈</div>
+    </div>
+    <div class="content-card">
+      <div class="card-label">Arte contemporáneo</div>
+      <div class="card-title">Kara Walker</div>
+      <div class="card-body">Sus siluetas en papel negro sobre blanco explotan la frontera racial como estructura visual: el negro sobre blanco, el esclavo sobre el amo, lo visible sobre lo invisible. La simplicidad formal desvela complejidades históricas enormes.</div>
+      <div class="card-corner">◈</div>
+    </div>
+    <div class="content-card">
+      <div class="card-label">Land Art</div>
+      <div class="card-title">Fronteras Naturales</div>
+      <div class="card-body">Robert Smithson con <em>Spiral Jetty</em> plantea la frontera entre naturaleza y artificio, entre tierra y agua. El land art cuestiona las fronteras entre arte y entorno, entre cultura y naturaleza.</div>
+      <div class="card-corner">◈</div>
+    </div>
+  </div>
+
+  <div class="pull-quote">
+    "La escultura existe en el umbral: ni es pura materia ni puro espacio. Habita la frontera entre el cuerpo que la toca y el vacío que la rodea."
+    <cite>— Rosalind Krauss, <em>La originalidad de la vanguardia</em></cite>
+  </div>
+
+  <div class="concept-tags">
+    <span class="tag">Espacio negativo</span>
+    <span class="tag">Monumento</span>
+    <span class="tag">Memoria colectiva</span>
+    <span class="tag">Land Art</span>
+    <span class="tag">Forma y vacío</span>
+    <span class="tag">Arte y naturaleza</span>
+  </div>
+</section>
+
+<!-- ═══ PINTURA ══════════════════════════════════════════════ -->
+<section class="discipline-section" id="pintura">
+  <div class="section-header">
+    <div class="section-index">06</div>
+    <div class="section-title-block">
+      <div class="section-label">Imagen · Color · Representación</div>
+      <h2 class="section-title">Pintura</h2>
+      <p class="section-subtitle">El marco como frontera absoluta. Dentro de él, el pintor construye mundos y alteridades que reflejan —o deforman— la realidad exterior.</p>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <div class="content-card">
+      <div class="card-label">Concepto central</div>
+      <div class="card-title">El Marco como Frontera</div>
+      <div class="card-body">El marco no es neutro: define qué merece ser representado y qué queda fuera. Desde la pintura flamenca hasta el impresionismo, las elecciones de marco son elecciones sobre qué realidad —y qué alteridad— reconocer.</div>
+      <div class="card-corner">▣</div>
+    </div>
+    <div class="content-card">
+      <div class="card-label">Orientalismo</div>
+      <div class="card-title">Pintar al Otro</div>
+      <div class="card-body">Edward Said analizó cómo la pintura orientalista europea (Delacroix, Gérôme) construía un "Oriente" imaginado: el otro exotizado, pasivo, atemporal. Pintar al otro es a menudo construirlo como objeto.</div>
+      <div class="card-corner">▣</div>
+    </div>
+    <div class="content-card">
+      <div class="card-label">Abstracción</div>
+      <div class="card-title">Rothko & el Límite</div>
+      <div class="card-body">Las capas de color de Mark Rothko crean fronteras pictóricas que tiemblan: los bordes entre colores nunca son nítidos. El espectador entra en un espacio liminal donde la frontera entre sujeto y obra se disuelve.</div>
+      <div class="card-corner">▣</div>
+    </div>
+    <div class="content-card">
+      <div class="card-label">Contemporáneo</div>
+      <div class="card-title">Frida Kahlo</div>
+      <div class="card-body">Kahlo pintó la frontera dentro del propio cuerpo: mestiza entre dos culturas, mujer entre el dolor y la vida, mexicana entre lo precolombino y lo moderno. Su autorretrato es un mapa de alteridades internas.</div>
+      <div class="card-corner">▣</div>
+    </div>
+  </div>
+
+  <div class="pull-quote">
+    "Toda pintura es un acto político: elige qué ver y cómo ver, construyendo al mismo tiempo lo propio y lo ajeno, el yo y el otro."
+    <cite>— John Berger, <em>Modos de ver</em></cite>
+  </div>
+
+  <div class="concept-tags">
+    <span class="tag">El marco</span>
+    <span class="tag">Orientalismo</span>
+    <span class="tag">Cuerpo fronterizo</span>
+    <span class="tag">Abstracción</span>
+    <span class="tag">Representación del otro</span>
+    <span class="tag">Mirada y poder</span>
+  </div>
+</section>
+
+<!-- ═══ THEORY BAND ══════════════════════════════════════════ -->
+<section class="theory-band">
+  <div class="theory-item">
+    <div class="theory-num">T — 01</div>
+    <div class="theory-term">Lévinas</div>
+    <div class="theory-author">Emmanuel Lévinas · Ética de la alteridad</div>
+    <div class="theory-body">El rostro del otro me interpela y me impone una responsabilidad ética infinita. La frontera entre yo y el otro no puede cerrarse sin hacer violencia: el otro me constituye.</div>
+  </div>
+  <div class="theory-item">
+    <div class="theory-num">T — 02</div>
+    <div class="theory-term">Bhabha</div>
+    <div class="theory-author">Homi K. Bhabha · El Tercer Espacio</div>
+    <div class="theory-body">El "tercer espacio" es el lugar de la enunciación cultural: ni aquí ni allí, ni lo propio ni lo ajeno. Es en ese espacio liminal donde emergen las identidades híbridas y las culturas negocian.</div>
+  </div>
+  <div class="theory-item">
+    <div class="theory-num">T — 03</div>
+    <div class="theory-term">Derrida</div>
+    <div class="theory-author">Jacques Derrida · Deconstrucción</div>
+    <div class="theory-body">Toda oposición binaria (propio/ajeno, interior/exterior) se sostiene sobre una jerarquía que la deconstrucción revela: lo supuestamente secundario (el otro, el margen) es condición de posibilidad del primero.</div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-brand">FRONTERA<span> & </span>ALTERIDAD</div>
+  <div class="footer-note">ARTES · TEORÍA · REPRESENTACIÓN</div>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top = e.clientY + 'px';
+    setTimeout(() => {
+      ring.style.left = e.clientX + 'px';
+      ring.style.top = e.clientY + 'px';
+    }, 60);
+  });
+
+  // Tabs
+  const tabs = document.querySelectorAll('.disc-tab');
+  const sections = document.querySelectorAll('.discipline-section');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      sections.forEach(s => s.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(tab.dataset.target).classList.add('active');
+      document.getElementById('discNav').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+</script>
+</body>
+</html>
